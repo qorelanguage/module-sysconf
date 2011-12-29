@@ -79,32 +79,61 @@ DLLEXPORT qore_license_t qore_module_license = QL_LGPL;
     Functions provided by this module are located in Qore main namespace.
     See Qore documentation for namespace members access and handling.
 */
-QoreNamespace SysconfNS("Sysconf");                                                                                     
+QoreNamespace SysconfNS("Sysconf");
+QoreNamespace ConfstrNS("Confstr");
 
 
 static AbstractQoreNode *f_sysconf(const QoreListNode *params, ExceptionSink *xsink) {
 #ifdef HAVE_SYSCONF
-   int param = (int)HARD_QORE_INT(params, 0);
+    int param = (int)HARD_QORE_INT(params, 0);
 
-   errno = 0;
-   int ret = sysconf(param);
+    errno = 0;
+    int ret = sysconf(param);
 
-   if (errno != 0) {
-       xsink->raiseException("SYSCONF-ERROR", strerror(errno));
-       return 0;
-   }
+    if (errno != 0) {
+        xsink->raiseException("SYSCONF-ERROR", strerror(errno));
+        return 0;
+    }
 
-   return new QoreBigIntNode(ret);
+    return new QoreBigIntNode(ret);
 #else
-   return missing_function_error("sysconf", xsink);
+    return missing_function_error("sysconf", xsink);
 #endif
 }
 
 
 static AbstractQoreNode *f_sysconf_constants(const QoreListNode *params, ExceptionSink *xsink) {
-//    QoreNamespace * sysns = staticSystemNamespace.findLocalNamespace(SYSCONF_NS);
-//    return SysconfNS.getConstantInfo();
     return SysconfNS.getConstantInfo();
+}
+
+
+static AbstractQoreNode *f_confstr(const QoreListNode *params, ExceptionSink *xsink) {
+#ifdef HAVE_CONFSTR
+    int param = (int)HARD_QORE_INT(params, 0);
+
+    size_t len = confstr (param, NULL, 0);
+    char *buff = (char *) malloc (len);
+
+    errno = 0;
+    if (confstr(param, buff, len + 1) == 0 || errno != 0)
+    {
+        free(buff);
+        xsink->raiseException("CONFSTR-ERROR", strerror(errno));
+        return 0;
+    }
+    
+    QoreStringNode *ret = new QoreStringNode(buff);
+    free(buff);
+    return ret;
+    
+#else
+    return missing_function_error("confstr", xsink);
+#endif
+}
+
+
+static AbstractQoreNode *f_confstr_constants(const QoreListNode *params, ExceptionSink *xsink) {
+    return ConfstrNS.getConstantInfo();
 }
 
 
@@ -630,14 +659,153 @@ QoreStringNode * sysconf_module_init() {
 
 #endif
 
+#ifdef HAVE_CONFSTR
+    // #define _CS_PATH                                1
+    #ifdef _CS_PATH
+    ConfstrNS.addConstant("CS_PATH", new QoreBigIntNode(_CS_PATH), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_ILP32_OFF32_CFLAGS         2
+    #ifdef _CS_POSIX_V6_ILP32_OFF32_CFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_ILP32_OFF32_CFLAGS", new QoreBigIntNode(_CS_POSIX_V6_ILP32_OFF32_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_ILP32_OFF32_LDFLAGS        3
+    #ifdef _CS_POSIX_V6_ILP32_OFF32_LDFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_ILP32_OFF32_LDFLAGS", new QoreBigIntNode(_CS_POSIX_V6_ILP32_OFF32_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_ILP32_OFF32_LIBS           4
+    #ifdef _CS_POSIX_V6_ILP32_OFF32_LIBS
+    ConfstrNS.addConstant("CS_POSIX_V6_ILP32_OFF32_LIBS", new QoreBigIntNode(_CS_POSIX_V6_ILP32_OFF32_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS        5
+    #ifdef _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_ILP32_OFFBIG_CFLAGS", new QoreBigIntNode(_CS_POSIX_V6_ILP32_OFFBIG_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS       6
+    #ifdef _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS", new QoreBigIntNode(_CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_ILP32_OFFBIG_LIBS          7
+    #ifdef _CS_POSIX_V6_ILP32_OFFBIG_LIBS
+    ConfstrNS.addConstant("CS_POSIX_V6_ILP32_OFFBIG_LIBS", new QoreBigIntNode(_CS_POSIX_V6_ILP32_OFFBIG_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_LP64_OFF64_CFLAGS          8
+    #ifdef _CS_POSIX_V6_LP64_OFF64_CFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_LP64_OFF64_CFLAGS", new QoreBigIntNode(_CS_POSIX_V6_LP64_OFF64_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_LP64_OFF64_LDFLAGS         9
+    #ifdef _CS_POSIX_V6_LP64_OFF64_LDFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_LP64_OFF64_LDFLAGS", new QoreBigIntNode(_CS_POSIX_V6_LP64_OFF64_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_LP64_OFF64_LIBS            10
+    #ifdef _CS_POSIX_V6_LP64_OFF64_LIBS
+    ConfstrNS.addConstant("CS_POSIX_V6_LP64_OFF64_LIBS", new QoreBigIntNode(_CS_POSIX_V6_LP64_OFF64_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS        11
+    #ifdef _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS", new QoreBigIntNode(_CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS       12
+    #ifdef _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS
+    ConfstrNS.addConstant("CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS", new QoreBigIntNode(_CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_LPBIG_OFFBIG_LIBS          13
+    #ifdef _CS_POSIX_V6_LPBIG_OFFBIG_LIBS
+    ConfstrNS.addConstant("CS_POSIX_V6_LPBIG_OFFBIG_LIBS", new QoreBigIntNode(_CS_POSIX_V6_LPBIG_OFFBIG_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS      14
+    #ifdef _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS
+    ConfstrNS.addConstant("CS_POSIX_V6_WIDTH_RESTRICTED_ENVS", new QoreBigIntNode(_CS_POSIX_V6_WIDTH_RESTRICTED_ENVS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFF32_CFLAGS             20
+    #ifdef _CS_XBS5_ILP32_OFF32_CFLAGS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFF32_CFLAGS", new QoreBigIntNode(_CS_XBS5_ILP32_OFF32_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFF32_LDFLAGS            21
+    #ifdef _CS_XBS5_ILP32_OFF32_LDFLAGS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFF32_LDFLAGS", new QoreBigIntNode(_CS_XBS5_ILP32_OFF32_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFF32_LIBS               22
+    #ifdef _CS_XBS5_ILP32_OFF32_LIBS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFF32_LIBS", new QoreBigIntNode(_CS_XBS5_ILP32_OFF32_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFF32_LINTFLAGS          23
+    #ifdef _CS_XBS5_ILP32_OFF32_LINTFLAGS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFF32_LINTFLAGS", new QoreBigIntNode(_CS_XBS5_ILP32_OFF32_LINTFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFFBIG_CFLAGS            24
+    #ifdef _CS_XBS5_ILP32_OFFBIG_CFLAGS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFFBIG_CFLAGS", new QoreBigIntNode(_CS_XBS5_ILP32_OFFBIG_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFFBIG_LDFLAGS           25
+    #ifdef _CS_XBS5_ILP32_OFFBIG_LDFLAGS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFFBIG_LDFLAGS", new QoreBigIntNode(_CS_XBS5_ILP32_OFFBIG_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFFBIG_LIBS              26
+    #ifdef _CS_XBS5_ILP32_OFFBIG_LIBS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFFBIG_LIBS", new QoreBigIntNode(_CS_XBS5_ILP32_OFFBIG_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_ILP32_OFFBIG_LINTFLAGS         27
+    #ifdef _CS_XBS5_ILP32_OFFBIG_LINTFLAGS
+    ConfstrNS.addConstant("CS_XBS5_ILP32_OFFBIG_LINTFLAGS", new QoreBigIntNode(_CS_XBS5_ILP32_OFFBIG_LINTFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LP64_OFF64_CFLAGS              28
+    #ifdef _CS_XBS5_LP64_OFF64_CFLAGS
+    ConfstrNS.addConstant("CS_XBS5_LP64_OFF64_CFLAGS", new QoreBigIntNode(_CS_XBS5_LP64_OFF64_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LP64_OFF64_LDFLAGS             29
+    #ifdef _CS_XBS5_LP64_OFF64_LDFLAGS
+    ConfstrNS.addConstant("CS_XBS5_LP64_OFF64_LDFLAGS", new QoreBigIntNode(_CS_XBS5_LP64_OFF64_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LP64_OFF64_LIBS                30
+    #ifdef _CS_XBS5_LP64_OFF64_LIBS
+    ConfstrNS.addConstant("CS_XBS5_LP64_OFF64_LIBS", new QoreBigIntNode(_CS_XBS5_LP64_OFF64_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LP64_OFF64_LINTFLAGS           31
+    #ifdef _CS_XBS5_LP64_OFF64_LINTFLAGS
+    ConfstrNS.addConstant("CS_XBS5_LP64_OFF64_LINTFLAGS", new QoreBigIntNode(_CS_XBS5_LP64_OFF64_LINTFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LPBIG_OFFBIG_CFLAGS            32
+    #ifdef _CS_XBS5_LPBIG_OFFBIG_CFLAGS
+    ConfstrNS.addConstant("CS_XBS5_LPBIG_OFFBIG_CFLAGS", new QoreBigIntNode(_CS_XBS5_LPBIG_OFFBIG_CFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LPBIG_OFFBIG_LDFLAGS           33
+    #ifdef _CS_XBS5_LPBIG_OFFBIG_LDFLAGS
+    ConfstrNS.addConstant("CS_XBS5_LPBIG_OFFBIG_LDFLAGS", new QoreBigIntNode(_CS_XBS5_LPBIG_OFFBIG_LDFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LPBIG_OFFBIG_LIBS              34
+    #ifdef _CS_XBS5_LPBIG_OFFBIG_LIBS
+    ConfstrNS.addConstant("CS_XBS5_LPBIG_OFFBIG_LIBS", new QoreBigIntNode(_CS_XBS5_LPBIG_OFFBIG_LIBS), bigIntTypeInfo);
+    #endif
+    // #define _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS         35
+    #ifdef _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS
+    ConfstrNS.addConstant("CS_XBS5_LPBIG_OFFBIG_LINTFLAGS", new QoreBigIntNode(_CS_XBS5_LPBIG_OFFBIG_LINTFLAGS), bigIntTypeInfo);
+    #endif
+    // #define _CS_DARWIN_USER_DIR                     65536
+    #ifdef _CS_DARWIN_USER_DIR
+    ConfstrNS.addConstant("CS_DARWIN_USER_DIR", new QoreBigIntNode(_CS_DARWIN_USER_DIR), bigIntTypeInfo);
+    #endif
+    // #define _CS_DARWIN_USER_TEMP_DIR                65537
+    #ifdef _CS_DARWIN_USER_TEMP_DIR
+    ConfstrNS.addConstant("CS_DARWIN_USER_TEMP_DIR", new QoreBigIntNode(_CS_DARWIN_USER_TEMP_DIR), bigIntTypeInfo);
+    #endif
+    // #define _CS_DARWIN_USER_CACHE_DIR               65538
+    #ifdef _CS_DARWIN_USER_CACHE_DIR
+    ConfstrNS.addConstant("CS_DARWIN_USER_CACHE_DIR", new QoreBigIntNode(_CS_DARWIN_USER_CACHE_DIR), bigIntTypeInfo);
+    #endif
+
+#endif
+
     builtinFunctions.add2("sysconf", f_sysconf, QC_CONSTANT, QDOM_DEFAULT, bigIntTypeInfo, 1, softBigIntTypeInfo, QORE_PARAM_NO_ARG);
     builtinFunctions.add2("sysconf_constants", f_sysconf_constants, QC_CONSTANT, QDOM_DEFAULT, hashTypeInfo);
+    builtinFunctions.add2("confstr", f_confstr, QC_CONSTANT, QDOM_DEFAULT, stringTypeInfo, 1, softBigIntTypeInfo, QORE_PARAM_NO_ARG);
+    builtinFunctions.add2("confstr_constants", f_confstr_constants, QC_CONSTANT, QDOM_DEFAULT, hashTypeInfo);
 
     return 0;                                                                                                        
 }                                                                                                                   
 
 void sysconf_module_ns_init(QoreNamespace *rns, QoreNamespace *qns) {                                                 
-   qns->addNamespace(SysconfNS.copy());                                                                               
+    qns->addNamespace(SysconfNS.copy());  
+    qns->addNamespace(ConfstrNS.copy());
 }                                                                                                                   
 
 void sysconf_module_delete() {                                                                                        
