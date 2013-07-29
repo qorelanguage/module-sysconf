@@ -36,7 +36,7 @@ Summary: Sysconf module for Qore
 Name: qore-sysconf-module
 Version: 1.0.0
 Release: 1%{dist}
-License: LGPL
+License: LGPL-2.0+
 Group: Development/Languages/Other
 URL: http://qore.org
 Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.bz2
@@ -45,6 +45,7 @@ BuildRequires: gcc-c++
 BuildRequires: qore-devel
 BuildRequires: qore
 BuildRequires: cmake
+BuildRequires: doxygen
 
 
 %description
@@ -59,9 +60,7 @@ find test -name *.q|xargs chmod 644
 %{__make}
 
 %install
-rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT/%{module_dir}
-mkdir -p $RPM_BUILD_ROOT/usr/share/doc/qore-sysconf-module
 make install VERBOSE=1 DESTDIR=$RPM_BUILD_ROOT
 
 %post
@@ -76,9 +75,9 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 %{module_dir}
-%doc COPYING README test/* docs/*.html docs/*.css
+%doc COPYING README test/* docs/html
 
 
 %changelog
-* Wed Oct 26 2011 Petr Vanek <petr.vanek@qoretechnologies.com>
+* Wed Oct 26 2011 Petr Vanek <petr.vanek@qoretechnologies.com> 1.0.0
 - initial package for Version 1.0.0
