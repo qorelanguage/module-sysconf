@@ -91,8 +91,8 @@ static AbstractQoreNode *f_sysconf(const QoreListNode *params, ExceptionSink *xs
     int ret = sysconf(param);
 
     if (errno != 0) {
-        xsink->raiseException("SYSCONF-ERROR", strerror(errno));
-        return 0;
+       xsink->raiseErrnoException("SYSCONF-ERROR", errno, "sysconf(%d) failed", param);
+       return 0;
     }
 
     return new QoreBigIntNode(ret);
@@ -111,21 +111,25 @@ static AbstractQoreNode *f_confstr(const QoreListNode *params, ExceptionSink *xs
 #ifdef HAVE_CONFSTR
     int param = (int)HARD_QORE_INT(params, 0);
 
-    size_t len = confstr (param, NULL, 0);
-    char *buff = (char *) malloc (len);
-
     errno = 0;
-    if (confstr(param, buff, len + 1) == 0 || errno != 0)
-    {
-        free(buff);
-        xsink->raiseException("CONFSTR-ERROR", strerror(errno));
-        return 0;
+    size_t len = confstr(param, NULL, 0);
+    if (!len || errno) {
+       xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", param);
+       return 0;
     }
-    
-    QoreStringNode *ret = new QoreStringNode(buff);
-    free(buff);
-    return ret;
-    
+
+    SimpleRefHolder<QoreStringNode> rv(new QoreStringNode);
+    // this reserves len + 1 bytes in the string
+    rv->reserve(len);
+    // theoretically there should be no error here, but just in case we have additional error handling
+    errno = 0;
+    if (!confstr(param, (char*)rv->getBuffer(), len + 1) || errno) {
+       xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", param);
+       return 0;
+    }
+
+    rv->terminate(len);
+    return rv.release();
 #else
     return missing_function_error("confstr", xsink);
 #endif
