@@ -1,0 +1,248 @@
+/*
+  ql_sysconf.qpp
+
+  Qore Programming Language
+
+  Copyright 2012-2013 Qore Technologies
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+
+#include <qore/Qore.h>
+#include <errno.h>
+#include <unistd.h>
+
+/** @mainpage %Qore %Sysconf Module
+
+    Contents of this documentation:
+    - @ref intro
+    - @ref functions
+    - @ref constants
+
+    @section intro Introduction
+
+    The sysconf module provides Qore the possibility to obtain runtime system infomation from the underlying operating system.
+    The functionality is provided by standard C library.
+
+    This module is released under the <a href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">LGPL 2.1</a>
+    and is tagged as such in the module's header (meaning it can be loaded unconditionally regardless of how
+    the %Qore library was initialized). This version of the module requires Qore 0.8.0+ to compile and run.
+
+    To use the module in a %Qore script, use the \c %%requires directive as follows:
+    @code %requires sysconf @endcode
+
+
+    Short example;
+    @code
+    %requires sysconf
+    printf("Count of CPUs: %N\n", sysconf(Sysconf::SC_NPROCESSORS_ONLN));
+    @endcode
+
+
+    @section functions Functions
+  
+    See @ref sysconf_functions
+
+
+    @section constants Constants
+
+    See:
+       - @ref sysconf_constants
+       - @ref pathconf_constants
+       - @ref confstr_constants
+
+*/
+static QoreNamespace SysconfNS("Sysconf");
+static QoreNamespace PathconfNS("Pathconf");
+static QoreNamespace ConfstrNS("Confstr");
+
+void init_sysconf_functions(QoreNamespace& ns);
+void init_confstr_constants(QoreNamespace& ns);
+void init_pathconf_constants(QoreNamespace& ns);
+void init_sysconf_constants(QoreNamespace& ns);
+
+
+QoreStringNode * sysconf_module_init() {
+
+    init_sysconf_functions(SysconfNS);
+
+    init_confstr_constants(ConfstrNS);
+    init_pathconf_constants(PathconfNS);
+    init_sysconf_constants(SysconfNS);
+
+    return 0;
+}
+
+void sysconf_module_ns_init(QoreNamespace *rns, QoreNamespace *qns) {
+    qns->addNamespace(SysconfNS.copy());
+    qns->addNamespace(ConfstrNS.copy());
+    qns->addNamespace(PathconfNS.copy());
+}
+
+void sysconf_module_delete() {
+   // nothing to do here in this case
+}
+
+
+// qore module symbols
+DLLEXPORT char qore_module_name[] = "sysconf";
+DLLEXPORT char qore_module_version[] = PACKAGE_VERSION;
+DLLEXPORT char qore_module_description[] = "Sysconf library wrapper";
+DLLEXPORT char qore_module_author[] = "Petr Vanek";
+DLLEXPORT char qore_module_url[] = "http://qore.org";
+DLLEXPORT int qore_module_api_major = QORE_MODULE_API_MAJOR;
+DLLEXPORT int qore_module_api_minor = QORE_MODULE_API_MINOR;
+DLLEXPORT qore_module_init_t qore_module_init = sysconf_module_init;
+DLLEXPORT qore_module_ns_init_t qore_module_ns_init = sysconf_module_ns_init;
+DLLEXPORT qore_module_delete_t qore_module_delete = sysconf_module_delete;
+DLLEXPORT qore_license_t qore_module_license = QL_LGPL;
+
+
+/** @defgroup sysconf_functions Sysconf Functions
+ */
+//@{
+namespace Qore::Sysconf;
+
+//! This function is used to inquire about runtime system parameters
+/** @param param The parameter argument should be one of the @ref sysconf_constants
+    @return The normal return value from sysconf is the value you requested. A value of -1 is returned both if the implementation does not impose a limit.
+
+    @throw SYSCONF-ERROR
+ */
+int sysconf(int param) [flags=RET_VALUE_ONLY] {
+#ifdef HAVE_SYSCONF
+    errno = 0;
+    int ret = sysconf(param);
+
+    if (errno != 0) {
+        xsink->raiseErrnoException("SYSCONF-ERROR", errno, "sysconf(%d) failed", param);
+        return 0;
+    }
+
+    //return new QoreBigIntNode(ret);
+    return ret;
+#else
+    return missing_function_error("sysconf", xsink);
+#endif
+}
+
+//! Returns a hash with allowed arguments to \c sysconf call
+/** @return hash with all available arguments for @ref sysconf
+
+    The hash has structure: constant name (string) - integer value
+ */
+hash sysconf_constants() [flags=CONSTANT] {
+    return SysconfNS.getConstantInfo();
+}
+
+
+//! Get string-valued parameters from the operating system
+/** @param param The parameter argument should be one of the @ref confstr_constants
+    @return A string with requested value.
+
+    @throw CONFSTR-ERRO
+ */
+string confstr(int param) [flags=RET_VALUE_ONLY] {
+#ifdef HAVE_CONFSTR
+    size_t len = confstr (param, NULL, 0);
+    if (!len || errno != 0)
+    {
+        xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", param);
+        return 0;
+    }
+
+    SimpleRefHolder<QoreStringNode> rv(new QoreStringNode);
+    // this reserves len + 1 bytes in the string
+    rv->reserve(len);
+    // theoretically there should be no error here, but just in case we have additional error handling
+    errno = 0;
+    if (!confstr(param, (char*)rv->getBuffer(), len + 1) || errno) {
+        xsink->raiseErrnoException("CONFSTR-ERROR", errno, "confstr(%d) failed", param);
+        return 0;
+    }
+    rv->terminate(len);
+    return rv.release(); 
+    
+#else
+    return missing_function_error("confstr", xsink);
+#endif
+}
+
+//! Returns a hash with allowed arguments to \c confstr call
+/** @return hash with all available arguments for @ref confstr
+
+    The hash has structure: constant name (string) - integer value
+ */
+hash confstr_constants() [flags=CONSTANT] {
+    return ConfstrNS.getConstantInfo();
+}
+
+//! This function is used to inquire about the limits that apply to the file named filename.
+/** @param filename a path to file
+    @param param The parameter argument should be one of the @ref pathconf_constants
+    @return The normal return value from pathconf is the value you requested. A value of -1 is returned both if the implementation does not impose a limit.
+
+    @throw PATHCONF-ERROR
+ */
+int pathconf(string filename, int param) [flags=RET_VALUE_ONLY] {
+#ifdef HAVE_PATHCONF
+    errno = 0;
+    int ret = pathconf(filename->getBuffer(), param);
+
+    if (errno != 0) {
+        xsink->raiseErrnoException("PATHCONF-ERROR", errno, "pathconf(%d) failed", param);
+        return 0;
+    }
+
+    //return new QoreBigIntNode(ret);
+    return ret;
+#else
+    return missing_function_error("pathconf", xsink);
+#endif
+}
+
+// TODO/FIXME: File is not public?
+/*
+ */
+//int fpathconf(ReadonlyFile[File] file, int param) {
+//#ifdef HAVE_PATHCONF
+//    errno = 0;
+//    int ret = fpathconf(file->getFD(), param);
+//
+//    if (errno != 0) {
+//        xsink->raiseErrnoException("FPATHCONF-ERROR", errno, "fpathconf(%d) failed", param);
+//        return 0;
+//    }
+//
+//    //return new QoreBigIntNode(ret);
+//    return ret;
+//#else
+//    return missing_function_error("fpathconf", xsink);
+//#endif
+//}
+
+//! Returns a hash with allowed arguments to \c pathconf call
+/** @return hash with all available arguments for @ref pathconf
+
+    The hash has structure: constant name (string) - integer value
+ */
+hash pathconf_constants() [flags=CONSTANT] {
+    return PathconfNS.getConstantInfo();
+}
+
+//@}
+
+

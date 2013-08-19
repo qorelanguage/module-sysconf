@@ -16,7 +16,7 @@ set (VERSION_MINOR 0)
 set (VERSION_PATCH 0)
 
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules )
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
 if (ENABLE_DEBUG)
     set(CMAKE_BUILD_TYPE Debug)
@@ -39,7 +39,7 @@ ADD_CUSTOM_TARGET(uninstall
   "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 
-SET(QORE_MIN_VERSION "0.8.0")
+SET(QORE_MIN_VERSION "0.8.8")
 FIND_PACKAGE (Qore REQUIRED)
 
 FIND_PACKAGE (Doxygen)
@@ -54,6 +54,48 @@ CHECK_FUNCTION_EXISTS(confstr HAVE_CONFSTR)
 if (HAVE_CONFSTR)
     add_definitions(-DHAVE_CONFSTR)
 endif (HAVE_CONFSTR)
+CHECK_FUNCTION_EXISTS(pathconf HAVE_PATHCONF)
+if (HAVE_PATHCONF)
+    add_definitions(-DHAVE_PATHCONF)
+endif(HAVE_PATHCONF)
+
+
+
+add_definitions("-DPACKAGE_VERSION=\"${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}\"")
+
+include_directories( ${QORE_INCLUDE_DIR} )
+include_directories( ${CMAKE_SOURCE_DIR}/src )
+
+set(CPP_SRC
+)
+set(QPP_SRC
+    src/sysconf.qpp
+    src/constants_sysconf.qpp
+    src/constants_confstr.qpp
+    src/constants_pathconf.qpp
+)
+
+qore_wrap_qpp(QPP_SOURCES "${QPP_SRC}")
+
+SET (module_name "sysconf")
+
+add_library(${module_name} SHARED ${CPP_SRC} ${QPP_SOURCES})
+set_target_properties(${module_name} PROPERTIES PREFIX "" SUFFIX "-api-${QORE_API_VERSION}.qmod")
+target_link_libraries(${module_name} ${QORE_LIBRARY} )
+install( TARGETS ${module_name} DESTINATION ${QORE_MODULES_DIR})
+
+
+# docs
+if (DOXYGEN_FOUND)
+    configure_file(${CMAKE_SOURCE_DIR}/docs/Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile @ONLY)
+
+    add_custom_target(docs ALL
+        ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen" VERBATIM
+    )
+endif (DOXYGEN_FOUND)
+
 
 
 MESSAGE(STATUS "")
@@ -66,12 +108,6 @@ MESSAGE(STATUS "Compiler: ${CMAKE_CXX_COMPILER} - ${CMAKE_CXX_COMPILER_ID}")
 MESSAGE(STATUS "FLags deb: ${CMAKE_CXX_FLAGS_DEBUG}")
 MESSAGE(STATUS "FLags rel: ${CMAKE_CXX_FLAGS}")
 MESSAGE(STATUS "-----------------------------")
-
-
-add_subdirectory(src)
-if (DOXYGEN_FOUND)
-    add_subdirectory(docs)
-endif (DOXYGEN_FOUND)
 
 
 # packaging related stuff

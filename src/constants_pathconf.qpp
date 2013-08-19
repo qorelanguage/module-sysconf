@@ -1,0 +1,141 @@
+/*
+  constants_pathconf.qpp
+
+  Qore Programming Language
+
+  Copyright 2012-2013 Qore Technologies
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
+
+#include <unistd.h>
+#include <qore/Qore.h>
+
+
+/** @defgroup pathconf_constants Pathconf Constants
+ */
+//@{
+namespace Qore::Sysconf::Pathconf;
+
+#ifdef HAVE_PATHCONF
+
+#ifdef _PC_LINK_MAX
+//! Pathconf wrapper for _PC_LINK_MAX
+const PC_LINK_MAX = _PC_LINK_MAX;
+#endif
+
+#ifdef _PC_MAX_CANON
+//! Pathconf wrapper for _PC_MAX_CANON
+const PC_MAX_CANON = _PC_MAX_CANON;
+#endif
+
+#ifdef _PC_MAX_INPUT
+//! Pathconf wrapper for _PC_MAX_INPUT
+const PC_MAX_INPUT = _PC_MAX_INPUT;
+#endif
+
+#ifdef _PC_NAME_MAX
+//! Pathconf wrapper for _PC_NAME_MAX
+const PC_NAME_MAX = _PC_NAME_MAX;
+#endif
+
+#ifdef _PC_PATH_MAX
+//! Pathconf wrapper for _PC_PATH_MAX
+const PC_PATH_MAX = _PC_PATH_MAX;
+#endif
+
+#ifdef _PC_PIPE_BUF
+//! Pathconf wrapper for _PC_PIPE_BUF
+const PC_PIPE_BUF = _PC_PIPE_BUF;
+#endif
+
+#ifdef _PC_CHOWN_RESTRICTED
+//! Pathconf wrapper for _PC_CHOWN_RESTRICTED
+const PC_CHOWN_RESTRICTED = _PC_CHOWN_RESTRICTED;
+#endif
+
+#ifdef _PC_NO_TRUNC
+//! Pathconf wrapper for _PC_NO_TRUNC
+const PC_NO_TRUNC = _PC_NO_TRUNC;
+#endif
+
+#ifdef _PC_VDISABLE
+//! Pathconf wrapper for _PC_VDISABLE
+const PC_VDISABLE = _PC_VDISABLE;
+#endif
+
+#ifdef _PC_SYNC_IO
+//! Pathconf wrapper for _PC_SYNC_IO
+const PC_SYNC_IO = _PC_SYNC_IO;
+#endif
+
+#ifdef _PC_ASYNC_IO
+//! Pathconf wrapper for _PC_ASYNC_IO
+const PC_ASYNC_IO = _PC_ASYNC_IO;
+#endif
+
+#ifdef _PC_PRIO_IO
+//! Pathconf wrapper for _PC_PRIO_IO
+const PC_PRIO_IO = _PC_PRIO_IO;
+#endif
+
+#ifdef _PC_SOCK_MAXBUF
+//! Pathconf wrapper for _PC_SOCK_MAXBUF
+const PC_SOCK_MAXBUF = _PC_SOCK_MAXBUF;
+#endif
+
+#ifdef _PC_FILESIZEBITS
+//! Pathconf wrapper for _PC_FILESIZEBITS
+const PC_FILESIZEBITS = _PC_FILESIZEBITS;
+#endif
+
+#ifdef _PC_REC_INCR_XFER_SIZE
+//! Pathconf wrapper for _PC_REC_INCR_XFER_SIZE
+const PC_REC_INCR_XFER_SIZE = _PC_REC_INCR_XFER_SIZE;
+#endif
+
+#ifdef _PC_REC_MAX_XFER_SIZE
+//! Pathconf wrapper for _PC_REC_MAX_XFER_SIZE
+const PC_REC_MAX_XFER_SIZE = _PC_REC_MAX_XFER_SIZE;
+#endif
+
+#ifdef _PC_REC_MIN_XFER_SIZE
+//! Pathconf wrapper for _PC_REC_MIN_XFER_SIZE
+const PC_REC_MIN_XFER_SIZE = _PC_REC_MIN_XFER_SIZE;
+#endif
+
+#ifdef _PC_REC_XFER_ALIGN
+//! Pathconf wrapper for _PC_REC_XFER_ALIGN
+const PC_REC_XFER_ALIGN = _PC_REC_XFER_ALIGN;
+#endif
+
+#ifdef _PC_ALLOC_SIZE_MIN
+//! Pathconf wrapper for _PC_ALLOC_SIZE_MIN
+const PC_ALLOC_SIZE_MIN = _PC_ALLOC_SIZE_MIN;
+#endif
+
+#ifdef _PC_SYMLINK_MAX
+//! Pathconf wrapper for _PC_SYMLINK_MAX
+const PC_SYMLINK_MAX = _PC_SYMLINK_MAX;
+#endif
+
+#ifdef _PC_2_SYMLINKS
+//! Pathconf wrapper for _PC_2_SYMLINKS
+const PC_2_SYMLINKS = _PC_2_SYMLINKS;
+#endif
+
+#endif
+//@}
+
