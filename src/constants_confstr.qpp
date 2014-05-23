@@ -294,9 +294,11 @@
 QoreStringNode* get_confstr(int c) {
     size_t len = confstr(c, 0, 0);
     QoreStringNode* buf = new QoreStringNode;
-    buf->allocate(len + 1);
-    confstr(c, (char*)buf->getBuffer(), len + 1);
-    buf->terminate(len);
+    if (len) {
+	buf->allocate(len + 1);
+	confstr(c, (char*)buf->getBuffer(), len + 1);
+	buf->terminate(len);
+    }
     return buf;
 }
 
