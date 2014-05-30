@@ -28,6 +28,10 @@ if (HAVE_PATHCONF)
     add_definitions(-DHAVE_PATHCONF)
 endif(HAVE_PATHCONF)
 
+if (${CMAKE_SYSTEM_NAME} MATCHES SunOS)
+    add_definitions(-D__EXTENSIONS__)
+endif()
+
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
