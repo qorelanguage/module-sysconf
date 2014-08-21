@@ -44,7 +44,7 @@ set(QPP_SRC
     src/constants_pathconf.qpp
 )
 
-qore_wrap_qpp(QPP_SOURCES "${QPP_SRC}")
+qore_wrap_qpp(QPP_SOURCES ${QPP_SRC})
 
 SET (module_name "sysconf")
 
