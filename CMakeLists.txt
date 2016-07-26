@@ -9,9 +9,7 @@ set (VERSION_PATCH 0)
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake )
 
-
 FIND_PACKAGE (Qore REQUIRED)
-
 
 # detect sysconf function
 INCLUDE (CheckFunctionExists)
@@ -32,6 +30,14 @@ if (${CMAKE_SYSTEM_NAME} MATCHES SunOS)
     add_definitions(-D__EXTENSIONS__)
 endif()
 
+# Check for C++11.
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 
