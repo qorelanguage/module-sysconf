@@ -54,11 +54,10 @@ qore_wrap_qpp(QPP_SOURCES ${QPP_SRC})
 
 SET (module_name "sysconf")
 
-add_library(${module_name} SHARED ${CPP_SRC} ${QPP_SOURCES})
+add_library(${module_name} MODULE ${CPP_SRC} ${QPP_SOURCES})
 
 qore_binary_module(${module_name} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 qore_dist("${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 qore_config_info()
-
