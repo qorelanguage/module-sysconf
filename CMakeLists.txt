@@ -56,8 +56,15 @@ SET (module_name "sysconf")
 
 add_library(${module_name} MODULE ${CPP_SRC} ${QPP_SOURCES})
 
-qore_binary_module(${module_name} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+qore_external_binary_module(${module_name} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 qore_dist("${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 
 qore_config_info()
+
+FIND_PACKAGE(Doxygen)
+if (DOXYGEN_FOUND)
+  qore_wrap_dox(QORE_DOX_SRC ${QORE_DOX_TMPL_SRC})
+  add_custom_target(QORE_MOD_DOX_FILES DEPENDS ${QORE_DOX_SRC})
+  add_dependencies(docs-module QORE_MOD_DOX_FILES)
+endif()
