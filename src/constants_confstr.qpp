@@ -304,7 +304,7 @@ QoreStringNode* get_confstr(int c) {
 
 /** @defgroup confstr_constants Confstr Constants
  */
-//@{
+///@{
 namespace Qore::Sysconf::Confstr;
 
 //! Confstr wrapper for _CS_PATH
@@ -508,5 +508,5 @@ const CS_V6_ENV = qore(get_confstr(_CS_V6_ENV));
 //! Confstr wrapper for _CS_V7_ENV
 const CS_V7_ENV = qore(get_confstr(_CS_V7_ENV));
 
-//@}
+///@}
 

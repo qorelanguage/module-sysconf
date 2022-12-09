@@ -109,7 +109,7 @@
 
 /** @defgroup pathconf_constants Pathconf Constants
  */
-//@{
+///@{
 namespace Qore::Sysconf::Pathconf;
 
 //! Confstr wrapper for _PC_LINK_MAX
@@ -174,5 +174,5 @@ const PC_SYMLINK_MAX = _PC_SYMLINK_MAX;
 
 //! Confstr wrapper for _PC_2_SYMLINKS
 const PC_2_SYMLINKS = _PC_2_SYMLINKS;
-//@}
+///@}
 

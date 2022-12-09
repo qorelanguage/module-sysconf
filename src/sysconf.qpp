@@ -113,7 +113,7 @@ DLLEXPORT qore_license_t qore_module_license = QL_LGPL;
 
 /** @defgroup sysconf_functions Sysconf Functions
  */
-//@{
+///@{
 namespace Qore::Sysconf;
 
 //! This function is used to inquire about runtime system parameters
@@ -243,6 +243,6 @@ hash pathconf_constants() [flags=CONSTANT] {
     return PathconfNS.getConstantInfo();
 }
 
-//@}
+///@}
 
 

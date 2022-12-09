@@ -889,7 +889,7 @@
 
 /** @defgroup sysconf_constants Sysconf Constants
  */
-//@{
+///@{
 namespace Qore::Sysconf::Sysconf;
 
 //! TODO/FIXME
@@ -1536,5 +1536,5 @@ const SC_THREAD_ROBUST_PRIO_INHERIT = _SC_THREAD_ROBUST_PRIO_INHERIT;
 
 //! Sysconf wrapper for _SC_THREAD_ROBUST_PRIO_PROTECT
 const SC_THREAD_ROBUST_PRIO_PROTECT = _SC_THREAD_ROBUST_PRIO_PROTECT;
-//@}
+///@}
 
