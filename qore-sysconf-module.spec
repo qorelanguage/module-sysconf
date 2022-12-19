@@ -34,7 +34,7 @@ Summary: Sysconf module for Qore
 Name: qore-sysconf-module
 Version: 1.1.0
 Release: 1%{dist}
-License: LGPL-2.0+
+License: MIT
 Group: Development/Languages/Other
 URL: http://qore.org
 Source: http://prdownloads.sourceforge.net/qore/%{name}-%{version}.tar.bz2
