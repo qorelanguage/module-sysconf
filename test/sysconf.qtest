@@ -1,0 +1,25 @@
+#!/usr/bin/env qore
+
+%new-style
+%strict-args
+%require-types
+%enable-all-warnings
+
+%requires sysconf
+
+%requires QUnit
+
+%exec-class SysconfTest
+
+class SysconfTest inherits QUnit::Test {
+    constructor() : QUnit::Test("OracleTest", "1.0", \ARGV) {
+        addTestCase("basic test", \basicTest());
+        set_return_value(main());
+    }
+
+    basicTest() {
+        assertGe(1, sysconf(Sysconf::SC_NPROCESSORS_ONLN));
+        assertEq(Type::String, confstr(CS_POSIX_V7_ILP32_OFF32_CFLAGS).type());
+        assertGt(0, pathconf(get_script_path(), PC_NAME_MAX));
+    }
+}
